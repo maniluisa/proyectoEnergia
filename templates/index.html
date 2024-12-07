@@ -103,6 +103,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="row justify-content-center ">
+                    <div class="col-lg-8 col-xl-7 mb-3 ">
+                        {% if porcentaje_renovable is not none %}
+                            <div class="resultado">
+                                <h4><span class="badge text-bg-success" ><i class="fas fa-solar-panel" ></i> El porcentaje de Energía Renovable en tu consumo es: {{ porcentaje_renovable | round(2) }}% </span></h4>
+                            </div>
+                        {% elif error %}
+                            <div class="error">
+                                <h4><span class="badge text-bg-danger" >{{ error }}</span></h4>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="text-center mt-4 ">
                     <button class="btn btn-x1 btn-outline-light" ><i class="fas fa-plug me-2" ></i>Calcular</button>
                 </div>
