@@ -84,7 +84,43 @@ def index():
     graph_url = base64.b64encode(img.getvalue()).decode('utf-8')
 
     #-----------FIN GRÁFICA DE BARRAS-----------
-    
+    #---------------Gráfica de barras-----------
+    df_renewables = pd.read_csv('static/archivo/04 share-electricity-renewables.csv')
+    df_wind = pd.read_csv('static/archivo/11 share-electricity-wind.csv')
+    df_solar = pd.read_csv('static/archivo/15 share-electricity-solar.csv')
+    df_hydro = pd.read_csv('static/archivo/07 share-electricity-hydro.csv')
+
+    year = df_renewables['Year'].max()
+    renewables_data = df_renewables[df_renewables['Year'] == year]
+
+    wind_data = df_wind[df_wind['Year'] == year]
+    solar_data = df_solar[df_solar['Year'] == year]
+    hydro_data = df_hydro[df_hydro['Year'] == year]
+
+    df = pd.merge(renewables_data[['Entity','Renewables (% electricity)']], wind_data[['Entity', 'Wind (% electricity)']], on = 'Entity')
+
+    df = pd.merge(df, solar_data[['Entity', 'Solar (% electricity)']], on = 'Entity')
+    df = pd.merge(df, hydro_data[['Entity', 'Hydro (% electricity)']], on = 'Entity')
+
+    wind_percentage = df['Wind (% electricity)'].values[0]
+    solar_percentage = df['Solar (% electricity)'].values[0]
+    hydro_percentage = df['Hydro (% electricity)'].values[0]
+
+    total_renewables = wind_percentage + solar_percentage +hydro_percentage
+    data = {
+        'Energía Renovable' : ['Eólica', 'Solar', 'Hidráulica'],'Participación' : [wind_percentage, solar_percentage,hydro_percentage]
+    }
+    df_graph = pd.DataFrame(data)
+    fig, ax = plt.subplots()
+    ax.set_title ('Partipación de Energías Renovables', fontsize = 14)
+    ax.pie(df_graph['Participación'], labels = df_graph['Energía Renovable'], autopct = '%1.1f%%', startangle = 90)
+    # para que la torta sea redonda
+    ax.axis('equal')
+    img = BytesIO()
+    plt.savefig(img, format = 'png')
+    img.seek(0)
+    graph_url2 = base64.b64encode(img.getvalue()).decode('utf-8')
+     #------------fin Gráfica de barras-----------
     if request.method == 'POST':
         try:
             consumo_total = float(request.form['consumo_total'])
@@ -100,7 +136,7 @@ def index():
         except ValueError:
             error ="Por Favor ingrese un valor válido para el consumo total."
     
-    return render_template('index.html',porcentaje_renovable = porcentaje_renovable, error = error, graph_url = graph_url)
+    return render_template('index.html',porcentaje_renovable = porcentaje_renovable, error = error, graph_url = graph_url, graph_url2 = graph_url2)
 
 if __name__ == '__main__':
     app.run(debug=True)#Este bloque verifica si el script está siendo ejecutado directamente (y no importado como un módulo en otro programa). Si es así, ejecuta el servidor de desarrollo de Flask con app.run(debug=True)
