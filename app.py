@@ -121,6 +121,54 @@ def index():
     img.seek(0)
     graph_url2 = base64.b64encode(img.getvalue()).decode('utf-8')
      #------------fin Gráfica de barras-----------
+     #------------GRÁFICO DE LINEAS---------------
+    wind_data = pd.read_csv('static/archivo/09 cumulative-installed-wind-energy-capacity-gigawatts.csv')
+    solar_data = pd.read_csv('static/archivo/13 installed-solar-PV-capacity.csv')
+    # dato más relevante por año dropna
+    wind_data = wind_data[['Year', 'Wind Capacity']].dropna()
+    solar_data = solar_data[['Year', 'Solar Capacity']].dropna()
+    #convertir todos los años en un valor númerico
+    wind_data['Year'] = pd.to_numeric(wind_data['Year'], errors = 'coerce')
+    solar_data['Year'] = pd.to_numeric(solar_data['Year'], errors = 'coerce')
+    plt.figure(figsize=(6,5))
+    # los puntos de referencia van ha estar marcados por o
+    plt.plot(wind_data['Year'],wind_data['Wind Capacity'],label = 'Capacidad Eólica', color = 'blue', marker = 'o')
+    plt.plot(solar_data['Year'], solar_data['Solar Capacity'], label = 'Capacidad Solar', color = 'orange', marker = 'x')
+
+    plt.title('Tendencia en la Capacidad Instalada (Eólica vs Solar)')
+    plt.xlabel('Año')
+    plt.ylabel('Capacidad Instalada (Gigawatts)')
+    plt.legend()
+    plt.grid(True)
+    img = BytesIO()
+    plt.savefig(img, format = 'png')
+    img.seek(0)
+    graph_url3 = base64.b64encode(img.getvalue()).decode('utf-8')
+
+     #--------FIN-GRÁFICO DE LINEAS---------------
+    #  comparar energia renobable con la tradicional pero como no tengo la tradicional dejo un dato estático
+     #------------GRÁFICO DE AREA---------------
+    renewable_data = pd.read_csv('static/archivo/02 modern-renewable-energy-consumption.csv')
+    renewable_data = renewable_data[renewable_data['Entity'] =='World']
+    renewable_data['Total Renewable Energy'] = (renewable_data['Geo Biomass Other - TWh']+ renewable_data['Solar Generation - TWh'] + renewable_data['Wind Generation -TWh'] + renewable_data['Hydro Generation - TWh'])
+    fig, ax = plt.subplots(figsize = (6, 5))
+    ax.fill_between(renewable_data['Year'], renewable_data['Total Renewable Energy'], color = 'green', alpha = 0.5, label = 'Energía Renovable')
+
+    conventional_data = pd.DataFrame({
+        'Year': renewable_data['Year'],
+        'Total Conventional Energy' :[1000]*len(renewable_data['Year'])
+        })
+    ax.fill_between(conventional_data['Year'],conventional_data['Total Conventional Energy'],color = 'red', alpha = 0.5, label = 'Energía Convencional')
+    ax.set_title('Comparación entre Consumo de Energía Renovable y convencional', fontsize = 12)
+    ax.set_xlabel('Año', fontsize = 12)
+    ax.set_ylabel('Consumo de Energía (TWh)', fontsize = 12)
+    ax.legend(loc = 'upper left')
+    img = BytesIO()
+    plt.savefig(img, format = 'png')
+    img.seek(0)
+    graph_url4 = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close()
+     #--------FIN-GRÁFICO DE AREA---------------
     if request.method == 'POST':
         try:
             consumo_total = float(request.form['consumo_total'])
@@ -136,7 +184,7 @@ def index():
         except ValueError:
             error ="Por Favor ingrese un valor válido para el consumo total."
     
-    return render_template('index.html',porcentaje_renovable = porcentaje_renovable, error = error, graph_url = graph_url, graph_url2 = graph_url2)
+    return render_template('index.html',porcentaje_renovable = porcentaje_renovable, error = error, graph_url = graph_url, graph_url2 = graph_url2, graph_url3 = graph_url3, graph_url4 = graph_url4)
 
 if __name__ == '__main__':
     app.run(debug=True)#Este bloque verifica si el script está siendo ejecutado directamente (y no importado como un módulo en otro programa). Si es así, ejecuta el servidor de desarrollo de Flask con app.run(debug=True)
