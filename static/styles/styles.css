@@ -10969,6 +10969,9 @@ html {
 }
 .masthead .masthead-avatar {
   width: 15rem;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
 }
 
 @media (min-width: 992px) {
@@ -11033,3 +11036,35 @@ html {
 .copyright {
   background-color: #1a252f;
 }
+
+
+          /* Estilos base para modo oscuro */
+          .dark header {
+            background-color: #cf99cf;
+            color: #000;
+            }
+          
+          .dark body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            }
+
+            .dark footer {
+                background-color: #cf99cf;
+                color: #000;
+                }
+
+
+            .dark body #proyectos{
+                background-color: #cf99cf;
+                color: #000;
+                }
+            .dark .dark\:bg-gray-800 {
+            background-color: #2d3748;
+            }
+            .dark .dark\:text-white {
+            color: #ffffff;
+            }
+            .dark .dark\:bg-gray-700 {
+            background-color: #4a5568;
+            }

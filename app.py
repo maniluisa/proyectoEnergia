@@ -66,8 +66,8 @@ def index():
     # permite crear varias formas de gráfico, recopila toda la info en una tabla virtual
     plt.subplots(figsize = (3, 2))
     # alias a la info 
-    df = pd.DataFrame(list(data.items()),columns = ['Fuente', 'Producción (TWh)'])
-
+    df = pd.DataFrame(list(data.items()),columns = ['Fuente', 'Producción (TWh)'])    
+    plt.style.use('dark_background')
     fig, ax = plt.subplots(figsize = (5, 4))
     ax.bar(df['Fuente'], df['Producción (TWh)'], color = ['blue', 'orange', 'green', 'red', 'purple'])
 
@@ -149,9 +149,11 @@ def index():
     #  comparar energia renobable con la tradicional pero como no tengo la tradicional dejo un dato estático
      #------------GRÁFICO DE AREA---------------
     renewable_data = pd.read_csv('static/archivo/02 modern-renewable-energy-consumption.csv')
+
     renewable_data = renewable_data[renewable_data['Entity'] =='World']
-    renewable_data['Total Renewable Energy'] = (renewable_data['Geo Biomass Other - TWh']+ renewable_data['Solar Generation - TWh'] + renewable_data['Wind Generation -TWh'] + renewable_data['Hydro Generation - TWh'])
+    renewable_data['Total Renewable Energy'] = (renewable_data['Geo Biomass Other - TWh']+ renewable_data['Solar Generation - TWh'] + renewable_data['Wind Generation - TWh'] + renewable_data['Hydro Generation - TWh'])
     fig, ax = plt.subplots(figsize = (6, 5))
+
     ax.fill_between(renewable_data['Year'], renewable_data['Total Renewable Energy'], color = 'green', alpha = 0.5, label = 'Energía Renovable')
 
     conventional_data = pd.DataFrame({
@@ -169,6 +171,13 @@ def index():
     graph_url4 = base64.b64encode(img.getvalue()).decode('utf-8')
     plt.close()
      #--------FIN-GRÁFICO DE AREA---------------
+
+
+    with open('static/archivo/data_pagina.csv', newline='',encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        data = [row for row in reader]
+
+
     if request.method == 'POST':
         try:
             consumo_total = float(request.form['consumo_total'])
@@ -184,7 +193,7 @@ def index():
         except ValueError:
             error ="Por Favor ingrese un valor válido para el consumo total."
     
-    return render_template('index.html',porcentaje_renovable = porcentaje_renovable, error = error, graph_url = graph_url, graph_url2 = graph_url2, graph_url3 = graph_url3, graph_url4 = graph_url4)
+    return render_template('index.html',porcentaje_renovable = porcentaje_renovable, error = error, graph_url = graph_url, graph_url2 = graph_url2, graph_url3 = graph_url3, graph_url4 = graph_url4, data=data)
 
 if __name__ == '__main__':
     app.run(debug=True)#Este bloque verifica si el script está siendo ejecutado directamente (y no importado como un módulo en otro programa). Si es así, ejecuta el servidor de desarrollo de Flask con app.run(debug=True)
